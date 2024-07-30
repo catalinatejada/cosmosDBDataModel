@@ -108,15 +108,26 @@ namespace CosmosDBDataModel.Helpers
 
             while (feed.HasMoreResults)
             {
-                FeedResponse<T> response = await feed.ReadNextAsync();
-                consumedRUs += response.RequestCharge;
-                foreach (T item in response)
+                try
                 {
-                    collection.Add(item);
+                    FeedResponse<T> response = await feed.ReadNextAsync();
+                    consumedRUs += response.RequestCharge;
+                    foreach (T item in response)
+                    {
+                        collection.Add(item);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
+
             return CosmosTestRun<T>.SaveInTestRun(collection, consumedRUs);
         }
 
+
     }
+
 }
+
